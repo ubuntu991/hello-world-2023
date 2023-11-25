@@ -1,16 +1,16 @@
 pipeline {
     agent any
-    tools{
+    tools {
         maven 'M2_HOME'
     }
     environment {
-    registry = '842615439834.dkr.ecr.us-east-1.amazonaws.com/devops-terra'
-    registryCredential = 'aws-credentials'
-    dockerimage = ''
-  }
+        registry = '842615439834.dkr.ecr.us-east-1.amazonaws.com/devops-terra'
+        registryCredential = 'aws-credentials'
+        dockerImage = ''
+    }
     stages {
-        stage('Checkout'){
-            steps{
+        stage('Checkout') {
+            steps {
                 git branch: 'main', url: 'https://github.com/ubuntu991/hello-world-2023.git'
             }
         }
@@ -26,19 +26,19 @@ pipeline {
         }
         stage('Build Image') {
             steps {
-                script{
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                } 
+                script {
+                    dockerImage = docker.build(registry + ":$BUILD_NUMBER")
+                }
             }
         }
         stage('Deploy image') {
-            steps{
-                script{ 
-                    docker.withRegistry("https://"+registry,"ecr:us-east-1:"+registryCredential) {
+            steps {
+                script {
+                    docker.withRegistry("https://" + registry, "ecr:us-east-1:" + registryCredential) {
                         dockerImage.push()
                     }
                 }
             }
-        }  
+        }
     }
 }
